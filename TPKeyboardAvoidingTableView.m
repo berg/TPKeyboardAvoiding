@@ -90,44 +90,11 @@
 - (void)keyboardWillShow:(NSNotification*)notification {
     _keyboardRect = [[[notification userInfo] objectForKey:_UIKeyboardFrameEndUserInfoKey] CGRectValue];
     _keyboardVisible = YES;
-    
-    UIView *firstResponder = [self findFirstResponderBeneathView:self];
-    if ( !firstResponder ) {
-        // No child view is the first responder - nothing to do here
-        return;
-    }
-    
-    if (!_priorInsetSaved) {
-        _priorInset = self.contentInset;
-        _priorInsetSaved = YES;
-    }
-    
-    // Shrink view's inset by the keyboard's height, and scroll to show the text field/view being edited
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationCurve:[[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue]];
-    
-    self.contentInset = [self contentInsetForKeyboard];
-    [self setContentOffset:CGPointMake(self.contentOffset.x,
-                                       [self idealOffsetForView:firstResponder withSpace:[self keyboardRect].origin.y - self.bounds.origin.y])
-                  animated:YES];
-    [self setScrollIndicatorInsets:self.contentInset];
-    
-    [UIView commitAnimations];
 }
 
 - (void)keyboardWillHide:(NSNotification*)notification {
     _keyboardRect = CGRectZero;
     _keyboardVisible = NO;
-    
-    // Restore dimensions to prior size
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationCurve:[[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue]];
-    self.contentInset = _priorInset;
-    [self setScrollIndicatorInsets:self.contentInset];
-    _priorInsetSaved = NO;
-    [UIView commitAnimations];
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
